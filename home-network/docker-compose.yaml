@@ -1,0 +1,46 @@
+services:
+  cloudflared:
+    container_name: cloudflared
+    image: visibilityspots/cloudflared
+    networks:
+      default:
+        ipv4_address: 10.0.0.2
+    restart: unless-stopped
+  pihole:
+    cap_add:
+      - NET_ADMIN
+    container_name: pihole
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    environment:
+      - ServerIP=10.0.0.3
+      - DNS1='10.0.0.2#5054'
+      - DNS2=''
+      - IPv6=false
+      - TZ='Asia/Kolkata'
+      - DNSMASQ_LISTENING=all
+      - WEBPASSWORD=${WEBPASSWORD}
+    hostname: pihole
+    image: pihole/pihole:latest
+    networks:
+      default:
+        ipv4_address: 10.0.0.3
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8080:80/tcp"
+      - "443:443/tcp"
+    restart: unless-stopped
+    volumes:
+      - './etc-pihole/:/etc/pihole/'
+      - './etc-dnsmasq.d/:/etc/dnsmasq.d/'
+
+networks:
+  default:
+    driver: bridge
+    name: home-network
+    ipam:
+      config:
+        - subnet: 10.0.0.0/29

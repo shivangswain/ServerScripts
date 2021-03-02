@@ -1,0 +1,99 @@
+services:
+  deluge:
+    container_name: deluge
+    depends_on:
+      - rclone
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ='Asia/Kolkata'
+    image: linuxserver/deluge
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - './config/deluge:/config'
+      - '/mnt/Seagate:/drive'
+  plex:
+    container_name: plex
+    depends_on:
+      - rclone
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      - PLEX_CLAIM=${CLAIM}
+    image: linuxserver/plex
+    networks:
+      - default
+    ports:
+      - "32400:32400/tcp"
+      - "33400:33400/tcp"
+      - "3005:3005/tcp"
+      - "8324:8324/tcp"
+      - "32469:32469/tcp"
+      - "1900:1900/udp"
+      - "32410:32410/udp"
+      - "32412:32412/udp"
+      - "32413:32413/udp"
+      - "32414:32414/udp"
+    restart: unless-stopped
+    volumes:
+      - /mnt/Seagate/PlexDB:/config
+      - /mnt/Seagate/Drive:/drive
+  rclone:
+    cap_add: 
+      - SYS_ADMIN
+    command: "mount Drive: /mnt/drive \
+     --use-mmap \
+     --allow-other \
+     --user-agent=1000 \
+     --dir-cache-time 1000h \
+     --poll-interval 30s \
+     --umask 002 \
+     --cache-dir=/mnt/cache \
+     --vfs-cache-mode full \
+     --vfs-cache-max-size 250G \
+     --vfs-cache-max-age 168h \
+     --drive-chunk-size 128M"
+    container_name: rclone
+    devices:
+      - /dev/fuse
+    image: rclone/rclone
+    networks:
+      - default
+    restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - ./config:/config
+      - ./logs:/logs
+      - /mnt/Seagate/Drive:/mnt/drive:shared
+      - /mnt/Seagate/Temp:/mnt/cache
+  samba:
+    container_name: samba
+    depends_on:
+    - rclone
+    image: dperson/samba
+    environment:
+      - TZ='Asia/Kolkata'
+    networks:
+      - default
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    read_only: false
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt/Seagate:/mnt/SambaDrive:z
+    command: '-s "NAS;/mnt/SambaDrive;yes;no;no" -u "${USERNAME};${PASSWORD}" -p'
+
+
+networks:
+  default:
+    name: media-server
