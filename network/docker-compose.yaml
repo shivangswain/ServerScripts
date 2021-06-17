@@ -15,10 +15,10 @@ services:
       - 1.1.1.1
     environment:
       - ServerIP=10.0.0.3
-      - DNS1='10.0.0.2#5054'
-      - DNS2=''
+      - DNS1=10.0.0.2#5054
+      - DNS2=
       - IPv6=false
-      - TZ='Asia/Kolkata'
+      - TZ=Asia/Kolkata
       - DNSMASQ_LISTENING=all
       - WEBPASSWORD=${WEBPASSWORD}
     hostname: pihole
