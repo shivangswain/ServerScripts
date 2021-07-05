@@ -3,7 +3,7 @@ services:
     container_name: cloudflared
     environment:
       - PORT=53
-    image: visibilityspots/cloudflared
+    image: visibilityspots/cloudflared:latest
     networks:
       default:
         ipv4_address: 10.1.1.10
@@ -17,7 +17,7 @@ services:
       - TZ=Asia/Kolkata
       - WEBPASSWORD=${WEBPASSWORD}
     hostname: pihole
-    image: pihole/pihole
+    image: pihole/pihole:latest
     networks:
       - default
     ports:

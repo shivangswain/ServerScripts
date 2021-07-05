@@ -9,7 +9,7 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${CLAIM}
       - DOCKER_MODS=linuxserver/mods:plex-absolute-hama
-    image: linuxserver/plex
+    image: linuxserver/plex:latest
     networks:
       - default
     ports:
@@ -46,7 +46,7 @@ services:
     container_name: rclone
     devices:
       - /dev/fuse
-    image: rclone/rclone
+    image: rclone/rclone:latest
     networks:
       - default
     restart: unless-stopped

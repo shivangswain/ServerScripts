@@ -2,7 +2,7 @@ services:
   portainer:
     command: '-H unix:///var/run/docker.sock'
     container_name: portainer
-    image: portainer/portainer-ce
+    image: portainer/portainer-ce:latest
     networks:
       - default
     ports:
